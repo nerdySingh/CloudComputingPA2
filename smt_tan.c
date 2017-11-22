@@ -28,44 +28,100 @@ double read_ram_size()
     double ram_size = atof(buffer);
     //printf("%f\n",ram_size);
     return ram_size;
-    fclose(f);
+    fclose(f);	
    
 
 }
 
-void merge_arrays(int arr[],int low, int mid ,int high)
+
+void set_merge(int arr[],int a1_l,int a2_l, int i, int j, int k, int m, int n,int low,int mid, int high)
 {
-
-	int i,j,k;
-	int arr1_length =  (mid-low)+1;
-	int arr2_length = (high-low);
-
-
-	int arr1[arr1_length];
-
-
-}
-
-
-
-void merge_sort(int arr[],int low,int high)
-{
-	int mid;
-	if (low<high)
+	
+	int arr1[a1_l], arr2[a2_l];
+	for(i = 0; i < a1_l; i++)
 	{
-		mid=(low+high)/2;
-		//gets the mid value 
-		merge_sort(arr,low,mid);
-		//recursively calls the function until we get the upper limit
-		merge_sort(arr,mid+1,high);
-		//recursively calls the 
-		merge_arrays(arr,low,mid,high);
+		int temp1 =  low+i;
+		arr1[i] = arr[temp1];
+
+	}
+
+	for(j = 0; j < a2_l; j++)
+	{
+		int temp2 = mid+1+j;
+        	arr2[j] = arr[temp2];
+	}
+    
+    while (m < a1_l && n < a2_l)
+    {
+        if (arr1[m] <= arr2[n])
+	{
+            arr[k] = arr1[m];
+	    k+=1;
+	    m+=1;
+	}
+        else
+	{
+            arr[k] = arr2[n];
+	    n=n+1;
+	    k=k+1;
+
+	}
+    }
+
+    while (m < a1_l)
+	{
+        	arr[k] = arr1[m];
+		k+=1;
+		m+=1;
+ 	}
+    while(n < a2_l)
+	{
+        arr[k] = arr2[n];
+	k+=1;
+	n+=1;
 	}
 
 }
 
 
 
+void call_merge(int arr[], int low, int mid, int high)
+{
+    int i, j, k=low,m=0,n=0;
+    int a1_l = mid - low + 1;
+    int a2_l = high - mid;
+    
+    set_merge(arr,a1_l,a2_l,i,j,k,m,n,low,mid,high);
+}
+ 
+
+
+void merge_sort(int arr[], int low, int high)
+{
+	int mid;
+    if (low < high)
+    {
+	int temp =  (high-low)/2;
+        mid = low + temp;
+        merge_sort(arr, low, mid);
+        merge_sort(arr, mid + 1, high);
+ 
+        call_merge(arr, low, mid, high);
+    }
+}
+ 
+
+
+
+
+
+
+
+
+/*
+
+
+*/
 
 
 int no_chunks_to_be_created(double ram_size,double file_size)
@@ -111,13 +167,14 @@ void externalMergeSort(int chunks_create, int ram_size,struct stat st)
 			}
 		}
 
-	
+	   	merge_sort(arr, 0, i - 1);
+		
     		for(i=0;i<ram_size;i++)
 		{
 			printf("%d:%d\n",i,arr[i]);
 	
 		}
-
+		
 
 
 		for(j=0;j<i;j++)

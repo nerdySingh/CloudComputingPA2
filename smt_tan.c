@@ -8,6 +8,90 @@
 #include <sys/sysctl.h>
 //#include <sys/vmmeter.h>
 #include <math.h>
+
+#define LCHILD(x) 2*x+1
+#define RCHILD(x) 2*x+2
+#define PARENT(x) (x-1)/2
+
+
+typedef struct node {
+    int data ;
+    int index;
+} node ;
+
+typedef struct minHeap {
+    int size ;
+    node *elem ;
+} minHeap ;
+
+
+/*
+    Function to initialize the min heap with size = 0
+*/
+minHeap initMinHeap(int size) {
+    minHeap hp ;
+    hp.size = 0 ;
+    return hp ;
+}
+
+
+/*
+    Function to swap data within two nodes of the min heap using pointers
+*/
+void swap(node *n1, node *n2) {
+    node temp = *n1 ;
+    *n1 = *n2 ;
+    *n2 = temp ;
+}
+
+
+
+
+void heapify(minHeap *hp, int i) {
+    int smallest = (LCHILD(i) < hp->size && hp->elem[LCHILD(i)].data < hp->elem[i].data) ? LCHILD(i) : i ;
+    if(RCHILD(i) < hp->size && hp->elem[RCHILD(i)].data < hp->elem[smallest].data) {
+        smallest = RCHILD(i) ;
+    }
+    if(smallest != i) {
+        swap(&(hp->elem[i]), &(hp->elem[smallest])) ;
+        heapify(hp, smallest) ;
+    }
+}
+
+
+/* 
+    Build a Min Heap given an array of numbers
+    Instead of using insertNode() function n times for total complexity of O(nlogn),
+    we can use the buildMinHeap() function to build the heap in O(n) time
+*/
+void buildMinHeap(minHeap *hp, int *arr, int size) {
+    int i ;
+
+    // Insertion into the heap without violating the shape property
+    for(i = 0; i < size; i++) {
+        if(hp->size) {
+            hp->elem = realloc(hp->elem, (hp->size + 1) * sizeof(node)) ;
+        } else {
+            hp->elem = malloc(sizeof(node)) ;
+        }
+        node nd ;
+        nd.data = arr[i] ;
+        hp->elem[(hp->size)++] = nd ;
+    }
+
+    // Making sure that heap property is also satisfied
+    for(i = (hp->size - 1) / 2; i >= 0; i--) {
+        heapify(hp, i) ;
+    }
+}
+
+
+
+
+
+
+
+
 void filegenerator(int size)
 {
     FILE *f = fopen("input.txt","w");
@@ -168,15 +252,6 @@ void externalMergeSort(int chunks_create, int ram_size,struct stat st)
 		}
 
 	   	merge_sort(arr, 0, i - 1);
-		
-    		for(i=0;i<ram_size;i++)
-		{
-			printf("%d:%d\n",i,arr[i]);
-	
-		}
-		
-
-
 		for(j=0;j<i;j++)
 		{
 
@@ -196,6 +271,72 @@ void externalMergeSort(int chunks_create, int ram_size,struct stat st)
 }
 
 
+void  merge_files_created(int ways,int ram_size)
+{
+	FILE *output_file = fopen("output.txt","w");
+	FILE *read_chunks[ways];
+	char filename[2];
+	int i=0;
+	for(i=0;i<ways;i++)
+	{
+		snprintf(filename,sizeof(filename),"%d",i);
+		//printf("%s",filename);
+		read_chunks[i] = fopen(filename,"r");
+	}
+
+	// create new node .
+	int* arr =(int *)malloc(ram_size*ways); 
+	node *myHeap =malloc(sizeof(node)*ways);
+	minHeap hp = initMinHeap(0);
+	for(i=0;i<ways;i++)
+	{
+		if(fscanf(read_chunks[i],"%d ",&arr[i])!=1)
+			break;
+
+	}
+	for(i=0;i<ways;i++)
+	{
+		printf("%d:%d\n",i,arr[i]);
+	}
+	
+
+	buildMinHeap(&hp,arr,i);
+	int count=0;
+	int index;
+	int data1;
+	while(count!=i)
+	{
+		int root = hp.elem[0].data;
+		printf("%d\n",root);
+		for(int j=0;j<ways;j++)
+		{
+			if( hp.elem[j].data == root)
+			{
+				index =j;
+				break;
+			}
+		}
+		
+		
+		if(fscanf(read_chunks[i],"%d ", &hp.elem[i].data)!=0)
+		{
+			hp.elem[index].data = 9999;
+			count++;
+		}
+		
+		heapify(&hp,root);
+		
+
+	}
+	
+}
+
+
+
+
+
+
+
 
 int main()
 {
@@ -212,5 +353,5 @@ int main()
     printf("%d\n",chunks_create);
     filegenerator(ram_size*chunks_create);
     externalMergeSort(chunks_create,ram_size, st);
-
+    merge_files_created(chunks_create,ram_size);
 }

@@ -360,7 +360,7 @@ void  merge_files_created(int ways,int ram_size)
 		//printf("%d\n",index);
 		if(index!=-1)
 		{
-			if(fscanf(read_chunks[index],"%d ",&root)!=1)
+			if(fscanf(read_chunks[count],"%d ",&root)!=1)
 			{
 
 			root =INT_MAX;	

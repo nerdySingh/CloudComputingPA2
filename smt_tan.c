@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -7,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 //#include <sys/vmmeter.h>
+#include <limits.h>
 #include <math.h>
 
 #define LCHILD(x) 2*x+1
@@ -271,6 +273,28 @@ void externalMergeSort(int chunks_create, int ram_size,struct stat st)
 }
 
 
+int find_index(int arr[],int l,int r,int x)
+{
+	if(r>=l)
+	{
+		int mid = l+(r-l)/2;
+		if(arr[mid]==x)
+		{
+			return mid;
+		}
+	
+		if(arr[mid]>x)
+		{
+			return find_index(arr,l,mid-1,x);
+
+		}
+		
+		return find_index(arr,mid+1,r,x);
+
+	}
+return -1;
+}
+
 void  merge_files_created(int ways,int ram_size)
 {
 	FILE *output_file = fopen("output.txt","w");
@@ -286,49 +310,81 @@ void  merge_files_created(int ways,int ram_size)
 
 	// create new node .
 	int* arr =(int *)malloc(ram_size*ways); 
-	node *myHeap =malloc(sizeof(node)*ways);
+	//node *myHeapNode= malloc(ways);
 	minHeap hp = initMinHeap(0);
 	for(i=0;i<ways;i++)
 	{
 		if(fscanf(read_chunks[i],"%d ",&arr[i])!=1)
 			break;
-
+		//hp.elem[i].index=i
+		//hp.elem[i].index=i;
+		//myHeapNode[i].index = i;
 	}
 	for(i=0;i<ways;i++)
 	{
 		printf("%d:%d\n",i,arr[i]);
 	}
 	
-
 	buildMinHeap(&hp,arr,i);
-	int count=0;
+	int sorted_array[ways];
+	/*int count=0;
 	int index;
 	int data1;
-	while(count!=i)
+	*/
+	//fclose(output_file);
+	//printf("%d\n",sizeof(hp));
+	int index;
+	int count=0;
+	int temp=0;
+	/*
+	for(int j=0;j<ways;j++)
 	{
-		int root = hp.elem[0].data;
-		printf("%d\n",root);
+		sorted_array[j]=hp.elem[j].data;
+	}*/
+	//int n = sizeof(sorted_array)/sizeof(sorted_array[0]);
+	//printf("Length:%d\n",i);
+	printf("Sorted_DATA:\n");
+	while(count !=i)
+	{
+		int root = hp.elem[0].data ;
+		printf("%d:%d\n",temp,root);
+		fprintf(output_file,"%d ",root);
 		for(int j=0;j<ways;j++)
-		{
-			if( hp.elem[j].data == root)
-			{
-				index =j;
-				break;
-			}
-		}
-		
-		
-		if(fscanf(read_chunks[i],"%d ", &hp.elem[i].data)!=0)
-		{
-			hp.elem[index].data = 9999;
-			count++;
-		}
-		
-		heapify(&hp,root);
-		
+	        {
+                	sorted_array[j]=hp.elem[j].data;
+        	}
 
+		int n = sizeof(sorted_array)/sizeof(sorted_array[0]);
+
+		index=find_index(sorted_array,0,n-1,root);
+		//printf("%d\n",index);
+		if(index!=-1)
+		{
+			if(fscanf(read_chunks[index],"%d ",&root)!=1)
+			{
+
+			root =INT_MAX;	
+			count++;
+
+			}
+
+			//printf("Read_ROOT:%d\n",root);
+			hp.elem[0].data = root;
+			heapify(&hp,0);
+			temp++;
+		}
+		else
+		{
+		break;
+		}
+	}//While Close.
+
+	for(i=0;i<ways;i++)
+	{
+		fclose(read_chunks[i]);
 	}
-	
+fclose(output_file);
+//Merged All files.
 }
 
 

@@ -1,7 +1,7 @@
 # CloudComputingPA2
 Cloud Computing Assignment 2 by Ion Raicu CS-553 IIT.
 
-Sorting Large datasets of 128 GB, 1 TB with Hadoop, Spark, Shared Memory and MPI
+Sorting Large datasets of 128 GB, 1 TB with Shared Memory and MPI on AWS and Chameleon.
 
 SHARED MEMORY TERA SORT
 

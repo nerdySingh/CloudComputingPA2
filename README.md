@@ -16,7 +16,8 @@ Steps to execute
 
 ./file_gen will generate the input.txt file to be sorted
 
-to Run shared memory execute ./smt
+to Run shared memory execute ./smt on linux based machines.
+
 to execute MPI
 
 mpicc -o mpi_ext mpi_external_sort.c -std=c99
